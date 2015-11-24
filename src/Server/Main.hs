@@ -1,7 +1,8 @@
 module Main where
 
 import API
-import Backend (Cat(..), getCatMap, addCat, deleteCat, makeAndAddCat, DB, CatMap(..))
+import Backend
+  (Cat(..), getCatMap, getCat, addCat, deleteCat, makeAndAddCat, DB, CatMap(..))
 import Control.Exception
 import Control.Monad
 import Control.Monad.IO.Class
@@ -16,10 +17,7 @@ import Servant
 -- type CatAPI = GetCatMapAPI :<|> AddCatAPI :<|> DeleteCatAPI
 
 catHandlers :: DB -> Server CatAPI
-catHandlers db = getCatMapHandler db :<|> addCat db :<|> deleteCat db
-
-getCatMapHandler :: DB -> Server GetCatMapAPI
-getCatMapHandler = getCatMap
+catHandlers db = getCatMap db :<|> getCat db :<|> addCat db :<|> deleteCat db
 
 app :: DB -> Application
 app db = serve api (catHandlers db)
@@ -30,5 +28,3 @@ main =
   let acquire   = openLocalState (CatMap empty)
       runServer = run 8080 . app
   in bracket acquire closeAcidState runServer
-
-  

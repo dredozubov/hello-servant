@@ -17,6 +17,7 @@ type GetCatMapAPI = "cat" :> Get '[JSON] [(Int, Cat)]
 -- [(Int, Cat)] -- Content response data type
 -- :<|> -- "choice"/"or" operator
 type CatAPI = GetCatMapAPI
+         :<|> "cat" :> Capture "id" Int :> Get '[JSON] (Maybe Cat)
          :<|> "cat" :> ReqBody '[JSON] Cat :> Put '[JSON] Int
          :<|> "cat" :> ReqBody '[JSON] Int :> Delete '[JSON] ()
 

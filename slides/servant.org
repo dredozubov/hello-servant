@@ -30,10 +30,10 @@ type API = "42" :> Get '[JSON] Int
 
 apiHandler = return 42
 
-fapi :: Proxy API
-fapi = Proxy
+api :: Proxy API
+api = Proxy
 
-main = run 8080 (serve fapi apiHandler)
+main = run 8080 (serve api apiHandler)
 #+END_SRC
 
 ** Why Servant
@@ -201,10 +201,6 @@ addOrderFromParams :: FirstName
 An article on implementing servant:
 
 http://www.well-typed.com/blog/2015/11/implementing-a-minimal-version-of-haskell-servant/
-
-** honorable mentions
-
-TODO
 
 ** contacts
 

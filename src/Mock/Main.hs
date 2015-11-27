@@ -14,7 +14,6 @@ import Network.Wai.Handler.Warp
 import Servant
 import Servant.Mock
 
-
 app :: Application
 app = serve api (mock api)
 

@@ -12,9 +12,6 @@ import Servant
 import Servant.Client
 
 
--- type CatAPI = GetCatMapAPI
---          :<|> "cat" :> ReqBody '[JSON] Cat :> Put '[JSON] Int
---          :<|> "cat" :> ReqBody '[JSON] Int :> Delete '[JSON] ()
 getCatMap :<|> getCat :<|> addCat :<|> deleteCat =
   client api (BaseUrl Http "localhost" 8080)
 

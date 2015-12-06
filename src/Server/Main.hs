@@ -14,13 +14,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 
--- type CatAPI = GetCatMapAPI :<|> AddCatAPI :<|> DeleteCatAPI
 
-catHandlers :: DB -> Server CatAPI
-catHandlers db = getCatMap db :<|> getCat db :<|> addCat db :<|> deleteCat db
-
-app :: DB -> Application
-app db = serve api (catHandlers db)
 
 main :: IO ()
 main =

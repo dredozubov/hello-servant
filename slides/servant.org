@@ -1,12 +1,15 @@
 #+AUTHOR:    Denis Redozubov, @rufuse
 #+EMAIL:     @rufuse
-#+TITLE:     Making web services better with servant
+#+TITLE:     Делаем свою жизнь проще c Servant
 #+OPTIONS:   H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
 #+STARTUP: beamer
 #+STARTUP: latexpreview
 #+BEAMER_THEME: Singapore [height=20pt]
 #+BEAMER_COLOR_THEME: crane
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[russian]{babel}
+#+LATEX_HEADER: \usepackage[T2A]{fontenc}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usetikzlibrary{matrix}
@@ -15,56 +18,56 @@
 #+LATEX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [unicode,presentation,bigger]
 
-* Slides & code
+* Слайды и код
+  
+** Слайды и код
 
-** Slides & code
+https://github.com/dredozubov/hello-servant/tree/ruhaskell
 
-https://github.com/dredozubov/hello-servant
+* Основы Servant
 
-* Servant basics
-
-** Server Example
+** Минимальный сервер
 
 #+BEGIN_SRC haskell
 type API = "42" :> Get '[JSON] Int
 
 apiHandler = return 42
 
-fapi :: Proxy API
-fapi = Proxy
+api :: Proxy API
+api = Proxy
 
-main = run 8080 (serve fapi apiHandler)
+main = run 8080 (serve api apiHandler)
 #+END_SRC
 
-** Why Servant
+** Почему Servant?
 
-- True Separations of concerns
-- Type Safety
-- Unified way of bringing API to server, clients, documentation
+- четкое распределение ролей
+- type safety
+- Способ объединить API для серверов, клиентов, документации
 
-** How we use servant
+** Как мы используем servant
 
-- Servant servers (1)
-- Generate mock servers to test client-server connectivity
-- Generated clients
-- We love type safety
-- (1) is possible to use in a Yesod subsite, we do that
+- http сервера (1)
+- Генерация мок-серверов для теста соединения между сервером и клиентом
+- Сгенерированные клиенты
+- (1) возможно использовать как subsite в др. фреймворках(e.g. Yesod)
+- (+ Мы любим type safety)
 
-** What is an API description?
+** Что такое описание API?
 
 #+BEGIN_SRC haskell
--- get all orders
+-- получить все заказы
 "/order" - GET
--- get one order
+-- получить один заказ
 "/order/:order_id/" - GET
--- add new order
+-- добавить один заказ
 "/order" - PUT / Request 'application/json'
          with Order object(see schema)
--- add payment to the order
+-- добавить платеж к заказу
 "/order/:order_id/payment" - GET
 #+END_SRC
 
-** APIs can be constructed with programming languages
+** API можно описать с помощью языка программирования
 
 #+BEGIN_SRC haskell
 api = Get "order" orders
@@ -73,7 +76,7 @@ api = Get "order" orders
   <|> Get "order/:id/payment" payments
 #+END_SRC
 
-** Monoids side-story
+** Отступление 1: Моноиды
 
 #+BEGIN_SRC haskell
 -- Laws:
@@ -89,7 +92,7 @@ instance [] a where
   (<>) = (++)
 #+END_SRC
 
-** Alternative side-story
+** Отступление 2: Alternative
 
 #+BEGIN_SRC haskell
 -- Laws:
@@ -108,7 +111,7 @@ instance Alternative Maybe where
   l       <|> _ = l
 #+END_SRC
 
-** API can be created of smaller parts
+** API возможно комбинировать из частей
 
 #+BEGIN_SRC haskell
 getOrderAPI = Get "order"
@@ -118,11 +121,11 @@ addOrderAPI = Put "order"
   `takes` (jsonOf order)
   `respondsWith` (jsonOf id)
 
--- It may be a part of bigger API or a router!
+-- это может быть частью большего API или роутера!
 orderAPI = getOrderAPI <|> addOrderAPI
 #+END_SRC
 
-** API is a type in Servant
+** API это тип в servant
 
 #+BEGIN_SRC haskell
 type API = "order" :> Get '[JSON] [Order]
@@ -134,12 +137,12 @@ type API = "order" :> Get '[JSON] [Order]
         :> Capture "from_params"
         :> QueryParam "first_name" FirstName
 	:> QueryParam "last_name" LastName
-	-- the rest of the stuff we need
-        -- to construct the order could be here
+	-- ...
+        -- Остаток параметров опущен
         :> Put '[JSON] Int
 #+END_SRC
 
-** Servant servers infer handler types from the API
+** Сервер наследует сигнатуры хендлеров из API
 
 #+BEGIN_SRC haskell
 -- we have only types here
@@ -156,53 +159,54 @@ addOrderFromParams :: FirstName
                    -> Server Int
 #+END_SRC
 
-** What can we infer from the API type
+** Что мы можем "извлечь" из API?
 
-- server handlers
-- full haskell client
-- thin js/ruby/etc clients
-- mock servers
+- хендлеры для серверов
+- полный haskell-клиент
+- тонкие js/ruby/etc клиенты
+- mock-сервера
 
-* A glimpse into the future
+
+* Взгляд в будущее
 
 ** servant-0.5
 
-- auth combinators - basic auth and JWT support
-- improved router with `Delayed` check etc
-- servant-foreign as a universal backend to codegen libraries
-- mandatory query params
+- auth комбинаторы - basic auth и JWT support
+- улучшенные роутеры с `Delayed` проверками и пр.
+- servant-foreign - универсальный бэкенд для генерации кода на других языках
+- обязательные query params
 
-** Possible integrations
+** Варианты интеграций
 
 - API Blueprint
 - Swagger
-- JSON Schema validations
+- JSON Schema
 
-** Notable projects
+** Проекты стоящие упоминания
 
 - servant-swagger
 - verdict
 
 * live coding
 
-** Plan of action
+** План действий
 
-- review a backend
-- define an API
-- construct a CRUD server
-- derive a haskell client
-- generate a js client
-- implement a mock server
+- обзор backend
+- определяем API
+- конструируем CRUD server
+- "выводим" клиент на haskell
+- генерация js-клиента
+- реализуем mock server
 
-* Other
+* Прочее
 
 ** Implementation
 
-An article on implementing servant:
+Статья про имплементацию servant:
 
 http://www.well-typed.com/blog/2015/11/implementing-a-minimal-version-of-haskell-servant/
 
 ** contacts
 
-- http://twitter.com/rufuse
-- http://bananasandlenses.net
+- http://twitter.com/rufuse (@rufuse)
+- http://bananasandlenses.net Подкаст "Бананы и линзы"

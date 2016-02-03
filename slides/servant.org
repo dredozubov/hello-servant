@@ -1,6 +1,6 @@
 #+AUTHOR:    Denis Redozubov, @rufuse
 #+EMAIL:     @rufuse
-#+TITLE:     Making web services better with servant
+#+TITLE:     Getting up to speed with servant
 #+OPTIONS:   H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
 #+STARTUP: beamer
@@ -15,8 +15,6 @@
 #+LATEX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [unicode,presentation,bigger]
 
-* Slides & code
-
 ** Slides & code
 
 https://github.com/dredozubov/hello-servant
@@ -30,10 +28,10 @@ type API = "42" :> Get '[JSON] Int
 
 apiHandler = return 42
 
-fapi :: Proxy API
-fapi = Proxy
+api :: Proxy API
+api = Proxy
 
-main = run 8080 (serve fapi apiHandler)
+main = run 8080 (serve api apiHandler)
 #+END_SRC
 
 ** Why Servant
